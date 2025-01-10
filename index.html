@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> AR Blockchain AI technology</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    #panorama {
+      width: 100vw;
+      height: 100vh;
+    }
+    .custom-icon {
+  background-color: rgba(232, 176, 176, 0.8);
+  border-radius: 50%;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  line-height: 20px;
+  transform: translate(-50%, -50%); 
+}
+
+  </style>
+</head>
+<body>
+  <div id="panorama"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.js"></script>
+  <script>
+    // Define the viewer with multiple scenes
+    const viewer = pannellum.viewer('panorama', {
+      default: {
+        firstScene: 'scene1',
+        autoLoad: true,
+        compass: true,
+        defaultFov: 120,
+        maxFov: 150,
+        minFov: 30
+      },
+      scenes: {
+        scene1: {
+          title: 'Starting Panorama',
+          type: 'equirectangular',
+          panorama: 'img.jpg', 
+          hotSpots: [
+            {
+              pitch: 0,
+              yaw: 0,
+              createTooltipFunc: customTooltip,
+              createTooltipArgs: {
+                text: 'Go to Scene 2',
+                sceneId: 'scene2'
+              }
+            }
+          ]
+        },
+        scene2: {
+          title: 'Second Panorama',
+          type: 'equirectangular',
+          panorama: 'img2.jpg', 
+          hotSpots: [
+            {
+              pitch: -5,
+              yaw: -20,
+              createTooltipFunc: customTooltip,
+              createTooltipArgs: {
+                text: 'Back to Scene 1',
+                sceneId: 'scene1'
+              }
+            }
+          ]
+        }
+      }
+    });
+
+    
+    function customTooltip(hotSpotDiv, args) {
+      hotSpotDiv.classList.add('custom-icon');
+      hotSpotDiv.innerHTML = args.text;
+      hotSpotDiv.onclick = function () {
+        viewer.loadScene(args.sceneId); 
+      };
+    }
+  </script>
+</body>
+</html>
