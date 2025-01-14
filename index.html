@@ -15,28 +15,39 @@
       height: 100vh;
     }
     .custom-icon {
-      background-color: rgba(232, 176, 176, 0.8);
-      border-radius: 50%;
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      border-radius: 5px;
+      background-color: transparent;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      font-weight: bold;
       color: white;
       text-align: center;
-      padding: 10px;
-      font-size: 12px;
-      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .custom-icon:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.2);
+    }
+    
+    .custom-icon span {
+      display: none;
+    }
+
+    .custom-icon:hover span {
       display: inline-block;
-      width: 40px;
-      height: 40px;
-      line-height: 20px;
-      transform: translate(-50%, -50%); 
     }
-    .custom-icon.social {
-      background-color: #4267B2;
-    }
-    .custom-icon.location {
-      background-color: #FF5733;
-    }
-    .custom-icon.name {
-      background-color: #2ECC71;
-    }
+
     .social-media-fixed {
       position: fixed;
       top: 10px;
@@ -45,17 +56,25 @@
       display: flex;
       gap: 10px;
     }
+
     .social-media-fixed a {
       text-decoration: none;
       color: white;
       width: 30px;
       height: 30px;
+      transition: transform 0.2s ease;
     }
+
+    .social-media-fixed a:hover {
+      transform: scale(1.1);
+    }
+
     .social-media-fixed svg {
       width: 100%;
       height: 100%;
       fill: white;
     }
+
   </style>
 </head>
 <body>
@@ -100,15 +119,13 @@
           hotSpots: [
             {
               pitch: 0,
-              yaw: 0,
+              yaw: 20,
               createTooltipFunc: customTooltip,
               createTooltipArgs: {
-                text: 'Go to Bar',
+                text: 'Bar',
                 sceneId: 'scene2'
               }
             },
-           
-            
           ]
         },
         scene2: {
@@ -117,15 +134,14 @@
           panorama: 'img4.jpg', 
           hotSpots: [
             {
-              pitch: -5,
-              yaw: -20,
+              pitch: 0,
+              yaw: 50,
               createTooltipFunc: customTooltip,
               createTooltipArgs: {
-                text: 'Back to Dining Hall',
+                text: 'Dining Hall',
                 sceneId: 'scene1'
               }
             },
-    
           ]
         }
       }
@@ -135,19 +151,13 @@
     function customTooltip(hotSpotDiv, args) {
       hotSpotDiv.classList.add('custom-icon');
 
-      if (args.className) {
-        hotSpotDiv.classList.add(args.className);
-      }
-
-      hotSpotDiv.innerHTML = args.text;
+      const span = document.createElement('span');
+      span.textContent = args.text;
+      hotSpotDiv.appendChild(span);
 
       if (args.sceneId) {
         hotSpotDiv.onclick = function () {
           viewer.loadScene(args.sceneId);
-        };
-      } else if (args.link) {
-        hotSpotDiv.onclick = function () {
-          window.open(args.link, '_blank');
         };
       }
     }
