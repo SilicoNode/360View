@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>360 View of a restaurant</title>
+  <title>360 View of a Restaurant</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css">
   <style>
     body {
@@ -13,6 +13,34 @@
     #panorama {
       width: 100vw;
       height: 100vh;
+    }
+    .control-button {
+      position: fixed;
+      bottom: 414px;
+      left: 3px;
+      
+      background-color: #ffffff;
+      color: white;
+      border: none;
+      border-radius: 15%;
+      cursor: pointer;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      transition: background-color 0.3s ease;
+    }
+    .control-button:hover {
+      background-color: #c8c8c8;
+      
+    
+    }
+    .control-button svg {
+      width: 18px;
+      height: 18px;
+      fill: rgb(0, 0, 0);
     }
     .custom-icon {
       position: absolute;
@@ -52,6 +80,8 @@
     }
     .social-media-fixed {
       position: fixed;
+      display: flex;
+      flex-direction: column;
       top: 10px;
       right: 10px;
       z-index: 1000;
@@ -69,12 +99,23 @@
       height: 100%;
       fill: white;
     }
+    .logo {
+            position: fixed;
+            bottom: 0px;
+           border: #ffffff;
+margin-left:-55px;
+            width: 200px;
+            height: 200px;
+        }
   </style>
 </head>
 <body>
   <div id="panorama"></div>
-
-  <!-- Fixed social media links -->
+  <button class="control-button" id="autoRotateButton">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-2.34-5.66l-2.83 2.83H22V2l-2.41 2.41A9.95 9.95 0 0 0 12 2zm0 4a6 6 0 1 0 6 6h-2a4 4 0 1 1-2.64-3.74L13.24 10H18V5.24l-1.36 1.36A5.98 5.98 0 0 0 12 6z"/>
+    </svg>
+  </button>
   <div class="social-media-fixed">
     <a href="https://www.facebook.com" target="_blank" title="Facebook">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -91,11 +132,35 @@
         <path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
       </svg>
     </a>
-  </div>
+    <a href="https://www.siliconode.com" target="_blank" aria-label="Website">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M12 0a12 12 0 1 0 12 12A12 12 0 0 0 12 0zm0 22.209A10.209 10.209 0 1 1 22.209 12 10.209 10.209 0 0 1 12 22.209zm.6-14.157a6.815 6.815 0 0 0-6.785 6.785h-2.57A9.376 9.376 0 0 1 12 2.625v2.927a6.815 6.815 0 0 0-.6-.5zM12 18.576a6.815 6.815 0 0 0 6.785-6.785h2.57A9.376 9.376 0 0 1 12 21.375v-2.927a6.815 6.815 0 0 0 .6.5zm-7.191-8.633h2.684a6.819 6.819 0 0 0 .123-2.42h-2.69a9.367 9.367 0 0 1-.117 2.42zm14.357 0a9.367 9.367 0 0 1-.117-2.42h-2.69a6.819 6.819 0 0 0 .123 2.42z"/>
+      </svg>
+    </a>
+    <a href="https://example.com/videos" target="_blank" class="link-item" title="Watch Videos">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M23 7v10c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2zM9 16l6.5-4L9 8v8z"/>
+      </svg>
+      
+  </a>
 
+  <!-- Gallery Link -->
+  <a href="https://example.com/gallery" target="_blank" class="link-item" title="View Gallery">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M21 3H3c-1.11 0-1.99.9-1.99 2L1 19c0 1.1.89 2 1.99 2H21c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM21 19H3V5h18v14zM6.5 12.75c.83 0 1.5-.67 1.5-1.5S7.33 9.75 6.5 9.75 5 10.42 5 11.25s.67 1.5 1.5 1.5zM19 15H9l3-4 2.25 3L17 11l2 4z"/>
+      </svg>
+      
+  </a>
+  </div>
+  <img src="./logo.png" alt="Logo" class="logo">
   <script src="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.js"></script>
   <script>
-    // Define the viewer with multiple scenes
+    let isRotating = false;
+    let animationFrameId = null;
+    const ROTATION_SPEED = 500; // Degrees per second
+    let lastTime = performance.now();
+
+    // Initialize the Pannellum viewer
     const viewer = pannellum.viewer('panorama', {
       default: {
         firstScene: 'scene1',
@@ -103,13 +168,13 @@
         compass: true,
         defaultFov: 120,
         maxFov: 150,
-        minFov: 30
+        minFov: 30,
       },
       scenes: {
         scene1: {
-          title: 'Dining hall',
+          title: 'Dining Hall',
           type: 'equirectangular',
-          panorama: 'img3.jpg', 
+          panorama: 'img3.jpg',
           hotSpots: [
             {
               pitch: 0,
@@ -117,15 +182,15 @@
               createTooltipFunc: customTooltip,
               createTooltipArgs: {
                 text: 'Bar',
-                sceneId: 'scene2'
-              }
+                sceneId: 'scene2',
+              },
             },
-          ]
+          ],
         },
         scene2: {
           title: 'Bar',
           type: 'equirectangular',
-          panorama: 'img4.jpg', 
+          panorama: 'img4.jpg',
           hotSpots: [
             {
               pitch: 0,
@@ -133,28 +198,75 @@
               createTooltipFunc: customTooltip,
               createTooltipArgs: {
                 text: 'Dining Hall',
-                sceneId: 'scene1'
-              }
+                sceneId: 'scene1',
+              },
             },
-          ]
-        }
-      }
+          ],
+        },
+      },
     });
 
-    // Custom tooltip function
     function customTooltip(hotSpotDiv, args) {
       hotSpotDiv.classList.add('custom-icon');
-
       const span = document.createElement('span');
       span.textContent = args.text;
       hotSpotDiv.appendChild(span);
 
       if (args.sceneId) {
-        hotSpotDiv.onclick = function () {
-          viewer.loadScene(args.sceneId);
-        };
+        hotSpotDiv.onclick = () => viewer.loadScene(args.sceneId);
       }
     }
+
+    function rotate(currentTime) {
+      if (!isRotating) return;
+
+      const deltaTime = (currentTime - lastTime) / 100; // Convert to seconds
+      lastTime = currentTime;
+
+      const currentYaw = viewer.getYaw();
+      const rotationAmount = ROTATION_SPEED * deltaTime;
+      viewer.setYaw(currentYaw + rotationAmount);
+
+      animationFrameId = requestAnimationFrame(rotate);
+    }
+
+    function startRotation() {
+      if (!isRotating) {
+        isRotating = true;
+        lastTime = performance.now();
+        animationFrameId = requestAnimationFrame(rotate);
+        autoRotateButton.classList.add('rotating');
+      }
+    }
+
+    function stopRotation() {
+      isRotating = false;
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      autoRotateButton.classList.remove('rotating');
+    }
+
+    const autoRotateButton = document.getElementById('autoRotateButton');
+    autoRotateButton.addEventListener('click', () => {
+      if (!isRotating) {
+        startRotation();
+      } else {
+        stopRotation();
+      }
+    });
+
+    // Handle user interactions
+    viewer.on('mousedown', stopRotation);
+    viewer.on('touchstart', stopRotation);
+
+    // Clean up on page unload
+    window.addEventListener('unload', () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    });
   </script>
 </body>
 </html>
